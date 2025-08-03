@@ -18,14 +18,14 @@
 
 1. Create a `scripts/` folder inside your mpv config directory if it doesn't exist.
 2. Save `mpv-clipper.lua` into the `scripts/` folder.
-3. *(Optional)* Create a `clipper.conf` file in the main mpv config directory to override settings.
+3. *(Optional)* Create a `mpv-clipper.conf` file in the main mpv config directory to override settings.
 
 **Final structure:**
 ```
 ~/.config/mpv/
 ├── scripts/
 │   └── mpv-clipper.lua
-└── clipper.conf  (optional)
+└── mpv-clipper.conf  (optional)
 ```
 
 ### 3. Ensure FFmpeg Is Available
@@ -67,7 +67,7 @@ ffmpeg -version
 
 ### Default Settings
 
-These are defined in the Lua script or can be overridden in `clipper.conf`.
+These are defined in the Lua script or can be overridden in `mpv-clipper.conf`.
 
 ```ini
 video_codec="libx264"
@@ -82,8 +82,6 @@ show_logs=true
 ```
 
 ### Example: Custom Configuration
-
-Create a file at `~/.config/mpv/clipper.conf` with content like:
 
 ```ini
 video_codec="libx265"
