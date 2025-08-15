@@ -1,5 +1,13 @@
 # mpv Clipper - Installation & Usage Guide
 
+## Overview
+
+`mpv-clipper` is a Lua script for [mpv](https://mpv.io/) that lets you quickly create clips from videos directly in the player.  
+It is **lossless by default** (using `copy` mode), but also supports quality presets (`high`, `medium`, `fast`, `tiny`) and a `custom` mode for advanced control.  
+You can **cycle between presets** with a single key (`q`).
+
+---
+
 ## Installation
 
 ### 1. Locate Your mpv Config Directory
@@ -18,14 +26,14 @@
 
 1. Create a `scripts/` folder inside your mpv config directory if it doesn't exist.
 2. Save `mpv-clipper.lua` into the `scripts/` folder.
-3. *(Optional)* Create a `clipper.conf` file in the main mpv config directory to override settings.
+3. *(Optional)* Create a `mpv-clipper.conf` file in the main mpv config directory to override settings.
 
 **Final structure:**
 ```
 ~/.config/mpv/
 ├── scripts/
 │   └── mpv-clipper.lua
-└── clipper.conf  (optional)
+└── mpv-clipper.conf  (optional)
 ```
 
 ### 3. Ensure FFmpeg Is Available
@@ -37,6 +45,8 @@ Test with:
 ffmpeg -version
 ```
 
+---
+
 ## Usage
 
 ### Basic Workflow
@@ -45,88 +55,117 @@ ffmpeg -version
 2. Seek to the desired **start** time
 3. Press `c` to mark the start
 4. Seek to the desired **end** time
-5. Press `c` again to mark the end and create the clip
+5. Press `v` to mark the end
+6. Press `b` to create the clip
 
-### Status & Debugging
+### Switching Quality Modes
 
-- Press `i` to display current clip status
-- Open the console (`~`) to view logs (if `show_logs = true`)
-- Press `Ctrl+Shift+C` to force a clip (if start/end were manually set)
-- Press `C` to reset the current selection
+- Press `q` to cycle through:  
+  `copy` → `high` → `medium` → `fast` → `tiny` → `custom` → back to `copy`
+
+`copy` mode = **lossless passthrough** (no re-encoding).  
+Other presets re-encode with different CRF, preset speed, and audio bitrates.  
+`custom` mode uses only what you define in `mpv-clipper.conf`.
+
+---
 
 ## Key Bindings
 
 | Key Combination | Description                                |
 |-----------------|--------------------------------------------|
-| `c`             | Toggle: set start → set end → create clip  |
-| `C`             | Cancel/reset current selection             |
-| `i`             | Show current clip status                   |
-| `Ctrl+Shift+C`  | Force clip creation (manual range)         |
+| `c`             | Set start point                            |
+| `v`             | Set end point                              |
+| `b`             | Create clip                                |
+| `q`             | Cycle quality mode                         |
+
+---
 
 ## Configuration
 
-### Default Settings
+Create or edit `mpv-clipper.conf` in your mpv config folder.
 
-These are defined in the Lua script or can be overridden in `clipper.conf`.
-
-```ini
-video_codec="libx264"
-audio_codec="aac"
-crf="20"
-preset="medium"
-container="mp4"
-audio_bitrate="128k"
-output_dir=""
-osd_duration="1500"
-show_logs=true
-```
-
-### Example: Custom Configuration
-
-Create a file at `~/.config/mpv/clipper.conf` with content like:
+### Example Config (lossless default, with optional scaling)
 
 ```ini
-video_codec="libx265"
-crf="23"
+# Output directory for clips (leave empty for same folder as source)
 output_dir="/home/user/clips"
-container="mkv"
+
+# Default codecs ("copy" = lossless passthrough)
+video_codec="copy"
+audio_codec="copy"
+
+# Container format (auto=same as input)
+container="auto"
+
+# Audio bitrate (used if audio is re-encoded)
 audio_bitrate="192k"
+
+# Optional CRF & preset (only used if re-encoding video)
+crf=""
+preset=""
+
+# Optional scaling (e.g., "1280:-1")
+scale=""
+
+# Clip filename suffix
+clip_suffix="-clip"
+
+# OSD duration in ms
+osd_duration=1500
+
+# Show debug logs in console
 show_logs=false
+
+# Default quality mode
+# Options: copy, high, medium, fast, tiny, custom
+quality="copy"
 ```
+
+### Preset Reference
+
+| Mode    | Video Codec | CRF  | Preset     | Audio Codec | Audio Bitrate |
+|---------|------------|------|------------|-------------|---------------|
+| copy    | copy       | —    | —          | copy        | —             |
+| high    | libx264    | 18   | slower     | aac         | 192k          |
+| medium  | libx264    | 20   | medium     | aac         | 128k          |
+| fast    | libx264    | 23   | fast       | aac         | 96k           |
+| tiny    | libx264    | 28   | ultrafast  | aac         | 64k           |
+| custom  | user-set   | —    | —          | user-set    | —             |
+
+---
 
 ## Clipping Examples
 
-### Example 1: Quick Clip
-
+### Example 1: Lossless Clip (default)
 ```
 1. mpv video.mp4
 2. Press `c` at 00:05:10
-3. Press `c` again at 00:06:30
-→ Output: video-clip-00-05-10-00-06-30.mp4
+3. Press `v` at 00:06:30
+4. Press `b` → Outputs lossless clip in same format as source
 ```
 
-### Example 2: Multiple Clips in One Session
-
+### Example 2: Quick Re-encode
 ```
-1. Clip 1 → 0:10 → `c`, 0:25 → `c`
-2. Clip 2 → 1:15 → `c`, 1:30 → `c`
-3. Clip 3 → 2:00 → `c`, 2:10 → `c`
+1. Press `q` until "medium" appears in OSD
+2. Set start/end with `c` and `v`
+3. Press `b` → Outputs re-encoded clip (CRF 20, medium preset, 128k audio)
 ```
 
-Each clip is saved separately with its own timestamped filename.
+---
 
 ## Troubleshooting
 
 ### Script Not Running?
-- Make sure `mpv-clipper.lua` is in the `scripts/` directory
-- Verify mpv is reading from the correct config directory
-- Press `~` and look for `[mpv-clipper]` messages
+- Ensure `mpv-clipper.lua` is in `scripts/`
+- Verify mpv is reading from correct config directory
+- Press `~` to open console and check for `[mpv-clipper]` messages
 
 ### Clip Fails to Create?
-- Ensure you’re not trying to clip a stream (e.g. YouTube URL)
-- Confirm FFmpeg is available and works independently
-- Check output path is writable
+- FFmpeg not found? Install and add to `PATH`
+- Output directory not writable? Adjust `output_dir`
+- Network streams may not be supported
 
 ### Keybindings Don't Work?
-- Conflicts with other scripts? Try modifying bindings in the script or use a config override.
-- Use `mpv --input-test` to verify keys are registering
+- Check for conflicts in other scripts
+- Edit bindings directly in Lua file if needed
+- Test with `mpv --input-test`
