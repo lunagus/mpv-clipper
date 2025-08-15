@@ -84,32 +84,10 @@ Other presets re-encode with different CRF, preset speed, and audio bitrates.
 
 Create or edit `mpv-clipper.conf` in your mpv config folder.
 
-<<<<<<< HEAD
 ### Example Config (lossless default, with optional scaling)
 
 ```ini
 # Output directory for clips (leave empty for same folder as source)
-=======
-These are defined in the Lua script or can be overridden in `mpv-clipper.conf`.
-
-```ini
-video_codec="libx264"
-audio_codec="aac"
-crf="20"
-preset="medium"
-container="mp4"
-audio_bitrate="128k"
-output_dir=""
-osd_duration="1500"
-show_logs=true
-```
-
-### Example: Custom Configuration
-
-```ini
-video_codec="libx265"
-crf="23"
->>>>>>> 8ec84bc71763aac0460cf9ab6aabe85d4a87119c
 output_dir="/home/user/clips"
 
 # Default codecs ("copy" = lossless passthrough)
