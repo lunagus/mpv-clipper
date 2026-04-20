@@ -24,7 +24,8 @@ local config = {
     quality         = "copy",     -- default mode
     crf             = "",
     preset          = "",
-    scale           = ""          -- e.g. "1280:-1"
+    scale           = "",         -- e.g. "1280:-1"
+    pixel_format    = ""          -- e.g. "yuv420p"
 }
 
 -- Quality presets
@@ -106,6 +107,10 @@ local function make_clip()
 
     if p.scale and p.scale ~= "" then
         table.insert(args, "-vf"); table.insert(args, "scale="..p.scale)
+    end
+
+    if p.pixel_format and p.pixel_format ~= "" then
+        table.insert(args, "-pix_fmt"); table.insert(args, p.pixel_format)
     end
 
     table.insert(args, out_path)
