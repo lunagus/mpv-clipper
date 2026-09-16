@@ -77,6 +77,7 @@ Other presets re-encode with different CRF, preset speed, and audio bitrates.
 | `v`             | Set end point                              |
 | `b`             | Create clip                                |
 | `q`             | Cycle quality mode                         |
+| `ctrl+i`        | Show clip info/status                      |
 
 ---
 
@@ -84,15 +85,36 @@ Other presets re-encode with different CRF, preset speed, and audio bitrates.
 
 Create or edit `mpv-clipper.conf` in your mpv config folder.
 
+These are defined in the Lua script or can be overridden in `clipper.conf`.
+
 ### Example Config (lossless default, with optional scaling)
 
+Create a file at `~/.config/mpv/clipper.conf` with content like:
+
 ```ini
-# Output directory for clips (leave empty for same folder as source)
+video_codec="libx264"
+audio_codec="aac"
+sub_codec="copy"
+crf="20"
+preset="medium"
+container="mp4"
+audio_bitrate="128k"
+output_dir=""
+osd_duration=1.5
+show_logs=true
+```
+
+### Example: Custom Configuration
+
+```ini
+video_codec="libx265"
+crf="23"
 output_dir="/home/user/clips"
 
 # Default codecs ("copy" = lossless passthrough)
 video_codec="copy"
 audio_codec="copy"
+sub_codec="copy"
 
 # Container format (auto=same as input)
 container="auto"
@@ -110,8 +132,8 @@ scale=""
 # Clip filename suffix
 clip_suffix="-clip"
 
-# OSD duration in ms
-osd_duration=1500
+# OSD baseline duration in seconds
+osd_duration=1.5
 
 # Show debug logs in console
 show_logs=false
@@ -123,14 +145,14 @@ quality="copy"
 
 ### Preset Reference
 
-| Mode    | Video Codec | CRF  | Preset     | Audio Codec | Audio Bitrate |
-|---------|------------|------|------------|-------------|---------------|
-| copy    | copy       | —    | —          | copy        | —             |
-| high    | libx264    | 18   | slower     | aac         | 192k          |
-| medium  | libx264    | 20   | medium     | aac         | 128k          |
-| fast    | libx264    | 23   | fast       | aac         | 96k           |
-| tiny    | libx264    | 28   | ultrafast  | aac         | 64k           |
-| custom  | user-set   | —    | —          | user-set    | —             |
+| Mode    | Video Codec | CRF  | Preset     | Audio Codec | Audio Bitrate | Sub Codec |
+|---------|------------|------|------------|-------------|---------------|-----------|
+| copy    | copy       | —    | —          | copy        | —             | copy      |
+| high    | libx264    | 18   | slower     | aac         | 192k          | copy      |
+| medium  | libx264    | 20   | medium     | aac         | 128k          | copy      |
+| fast    | libx264    | 23   | fast       | aac         | 96k           | copy      |
+| tiny    | libx264    | 28   | ultrafast  | aac         | 64k           | copy      |
+| custom  | user-set   | —    | —          | user-set    | —             | user-set  |
 
 ---
 
